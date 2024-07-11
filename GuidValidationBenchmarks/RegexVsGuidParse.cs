@@ -6,7 +6,6 @@ using BenchmarkDotNet.Attributes;
 namespace GuidTestBenchmarks
 {
     [MemoryDiagnoser]
-    [RPlotExporter]
     [SuppressMessage(
         "Major Code Smell",
         "S1118:Utility classes should not have public constructors",
@@ -21,9 +20,17 @@ namespace GuidTestBenchmarks
 
         private static string ValueWithGuid => $"/prefix/{Guid.NewGuid()}";
         private static string ValueWithoutGuid => "/prefix/";
+        private static string ValueWithoutPrefixAndGuid => "/";
+        private static string EmptyValue => string.Empty;
 
         private static readonly List<Func<string>> generators =
-            new() { () => ValueWithGuid, () => ValueWithoutGuid };
+            new()
+            {
+                () => ValueWithGuid,
+                () => ValueWithoutGuid,
+                () => EmptyValue,
+                () => ValueWithoutPrefixAndGuid
+            };
 
         private static readonly IEnumerable<string> data = Enumerable
             .Range(0, 10_000)
@@ -42,6 +49,13 @@ namespace GuidTestBenchmarks
                 if (split.Length == 3)
                     Guid.TryParse(split[2], out var _);
             }
+        }
+
+        [Benchmark]
+        public static void GuidTryParseWithSplitLastOrDefault()
+        {
+            foreach (var value in data)
+                Guid.TryParse(value.Split('/').LastOrDefault(), out var _);
         }
 
         [Benchmark]
