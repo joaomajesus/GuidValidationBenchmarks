@@ -24,13 +24,12 @@ namespace GuidTestBenchmarks
         private static string EmptyValue => string.Empty;
 
         private static readonly List<Func<string>> generators =
-            new()
-            {
-                () => ValueWithGuid,
-                () => ValueWithoutGuid,
-                () => EmptyValue,
-                () => ValueWithoutPrefixAndGuid
-            };
+        [
+            () => ValueWithGuid,
+            () => ValueWithoutGuid,
+            () => EmptyValue,
+            () => ValueWithoutPrefixAndGuid
+        ];
 
         private static readonly IEnumerable<string> data = Enumerable
             .Range(0, 10_000)
@@ -47,7 +46,7 @@ namespace GuidTestBenchmarks
                 var split = value.Split('/');
 
                 if (split.Length == 3)
-                    Guid.TryParse(split[2], out var _);
+                    Guid.TryParse(split[2], out _);
             }
         }
 
@@ -55,7 +54,7 @@ namespace GuidTestBenchmarks
         public static void GuidTryParseWithSplitLastOrDefault()
         {
             foreach (var value in data)
-                Guid.TryParse(value.Split('/').LastOrDefault(), out var _);
+                Guid.TryParse(value.Split('/').LastOrDefault(), out _);
         }
 
         [Benchmark]
